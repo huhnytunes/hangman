@@ -4,7 +4,20 @@ require 'highline/import'
 
 class Viewer
   def initialize
+    if TermInfo.screen_size[1].to_i < 110 ||TermInfo.screen_size[0].to_i < 36
+      puts "MAKE YOUR TERMINAL BIGGER!!!".red
+      sleep(10)
+      exit
+    end
     @lines = 0
+    @o = ["         xxxxxxxxxx         ","      xxxxx      xxxxx      ","   xxxxx            xxxxx   ","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
+    @u = ["xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
+    @y = ["xxxxxx                xxxxxx","  xxxxxx            xxxxxx  ","    xxxxxx        xxxxxx    ","      xxxxxx    xxxxxx      ","        xxxxxxxxxxxx        ","          xxxxxxxx          ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           "]
+    @l = ["xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
+    @s = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","              xxxxxxx","              xxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
+    @e = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
+    @w = ["xxxxxxx            xxxxxxxxx            xxxxxxx","xxxxxxx            xxxxxxxxx            xxxxxxx"," xxxxxxx          xxxxxxxxxxx          xxxxxxx "," xxxxxxx          xxxxxxxxxxx          xxxxxxx ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","     xxxxxxx  xxxxxxx     xxxxxxx  xxxxxxx     ","      xxxxxxxxxxxxxx       xxxxxxxxxxxxxx      ","       xxxxxxxxxxxx         xxxxxxxxxxxx       "]
+    @n = ["xxxxxxx          xxxx","xxxxxxxx         xxxx","xxxxxxxxx        xxxx","xxxx xxxxx       xxxx","xxxx  xxxxx      xxxx","xxxx   xxxxx     xxxx","xxxx    xxxxx    xxxx","xxxx     xxxxx   xxxx","xxxx      xxxxx  xxxx","xxxx       xxxxx xxxx","xxxx        xxxxxxxxx","xxxx         xxxxxxxx","xxxx          xxxxxxx"]
   end
   def clear
     print "\e[2J"
@@ -19,24 +32,24 @@ class Viewer
     ""
   end
 
-  def print_line(text, color = true, lines = 1)
-    half_mid = @mid.to_i/2
+  def print_line(text, color = true, lines = 1, set_space = 6)
+    mid = TermInfo.screen_size[1].to_i
+    half_set = mid.to_i/set_space
+    mid_rest = TermInfo.screen_size[1].to_i - half_set*2
     lines.times do
       @lines += 1
       lineup_space =  '         ' if color
-      unless @lines >= TermInfo.screen_size[0]
-        puts "#{fill(half_mid)}#{print text.center(@mid,' ')}#{fill((half_mid),lineup_space)}"
+      unless @lines >= TermInfo.screen_size[0].to_i
+        puts "#{fill(half_set)}#{print text.center(mid_rest,' ')}#{fill((half_set),lineup_space)}"
       end
     end
   end
-  def find_term_size
+  def find_term_size(size = 2)
     term_size = TermInfo.screen_size
-    term_size_part = term_size[1]/2
+    term_size_part = (term_size[1]/size).to_i
   end
   def home
     clear
-    @mid = find_term_size
-    @mid = @mid.to_i
     print_line(' ',false,7)
     print_line("Welcome to hangman!!".red,)
     print_line("What type if hangman do you wnat to play?".red)
@@ -61,7 +74,6 @@ class Viewer
   end
   def print_game(status, word, right_letters, wrong_letters)
     clear
-    @mid = find_term_size
     head,left_arm,right_arm,body,left_leg,right_leg = set_person(status)
     unless status == 0
       print_board(head,left_arm,right_arm,body,left_leg,right_leg)
@@ -86,24 +98,32 @@ class Viewer
     print_line(new_letters.join)
   end
   def dead(word)
-    o = ["         xxxxxxxxxx         ","      xxxxx      xxxxx      ","   xxxxx            xxxxx   ","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
-    u = ["xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
-    y = ["xxxxxx                xxxxxx","  xxxxxx            xxxxxx  ","    xxxxxx        xxxxxx    ","      xxxxxx    xxxxxx      ","        xxxxxxxxxxxx        ","          xxxxxxxx          ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           "]
-    l = ["xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    s = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","              xxxxxxx","              xxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    e = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    o.length.times do |num|
-      puts "      #{y[num]}     #{o[num]}     #{u[num]}"
+    clear
+    print_line(' ',false,3)
+    @o.length.times do |num|
+      print_line("#{@y[num]}     #{@o[num]}     #{@u[num]}".red)
     end
-    o.length.times do |num|
-      puts "#{l[num]}     #{o[num]}     #{s[num]}     #{e[num]}"
+    print_line(' ',false,3)
+    @o.length.times do |num|
+      print_line("#{@l[num]}     #{@o[num]}     #{@s[num]}     #{@e[num]}".red)
     end
-    puts "word was #{word.join} "
-
+    print_line(' ',false,3)
+    print_line("The word was #{word.join.blue}".green)
+    sleep(5)
   end
   def won!(word)
-    Puts 'Won'
-    puts "You guessed the word #{word}!!"
+    clear
+    print_line(' ',false,3)
+    @o.length.times do |num|
+      print_line("#{@y[num]}     #{@o[num]}     #{@u[num]}".green)
+    end
+    print_line(' ',false,3)
+    @o.length.times do |num|
+      print_line("#{@w[num]}     #{@o[num]}     #{@n[num]}".green)
+    end
+    print_line(' ',false,3)
+    print_line("The word was #{word.join.blue}".green)
+    sleep(5)
   end
   def set_person(status)
     head = 'O'.red

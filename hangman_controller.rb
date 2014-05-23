@@ -41,10 +41,11 @@ class Controller
   def get_status
     @status = 6
     if print_board(@word.current_word)
-      @viewer.won(@word.target_word)
+      @viewer.won!(@word.target_word)
     else
       @viewer.dead(@word.target_word)
     end
+    @viewer.home
   end
 
   def print_board(word_filled)
@@ -67,7 +68,7 @@ class Controller
   end
 
   def won?(word_filled)
-    true if word_filled.join == @word.target_word
+    true if word_filled.join == @word.target_word.join
   end
 end
 

@@ -12,7 +12,7 @@ class WordBank
   end
 
   def get_word(size)
-    @word_hash[size].sample.upcase
+    @word_hash[size.to_i].sample.upcase
   end
 
   def random_word

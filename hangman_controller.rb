@@ -1,5 +1,5 @@
-require_relative 'hangman_view', 'hangman_model'
-
+require_relative 'hangman_view'
+require_relative 'hangman_model'
 class Controller
   attr_accessor :word
   def initialize
@@ -22,38 +22,38 @@ class Controller
   end
 
   def get_random_word
-    Word.new(@model.random_word)
-    print_board
+    @word = Word.new(@model.random_word)
+    get_status
   end
 
   def get_word_with_length
     length = @viewer.choose_length
-    Word.new(@model.get_word(length))
-    print_board
+    @word = Word.new(@model.get_word(length))
+    get_status
   end
 
   def get_word_from_user
-    Word.new(@viewer.choose_word)
-    print_board
+    @word = Word.new(@viewer.choose_word)
+    get_status
   end
 
 
   def get_status
     @status = 6
-    if print_board
-      @viewer.won(@word)
+    if print_board(@word.current_word)
+      @viewer.won(@word.target_word)
     else
-      @viewer.dead(@word)
+      @viewer.dead(@word.target_word)
     end
   end
 
   def print_board(word_filled)
     return false if dead?
     return true if won?(word_filled)
-    guess = @viewer.print_game(@status, word_filled.join, @letter_bank.correct, @letter_bank.incorrect)
+    guess = @viewer.print_game(@status, word_filled.join, @letter_bank.correct_letters, @letter_bank.incorrect_letters)
     guess = guess.upcase
-    word_filled = @model.check_word(guess)
-    if @model.is_correct?(guess)
+    word_filled = @word.check_word(guess)
+    if @word.is_correct?(guess)
       @letter_bank.add_correct(guess)
     else
       @letter_bank.add_incorrect(guess)
@@ -63,14 +63,14 @@ class Controller
   end
 
   def dead?
-    true if @status = 0
+    true if @status == 0
   end
 
   def won?(word_filled)
-    true if word_filled.join.upcase == @model.word.upcase
+    true if word_filled.join == @word.target_word
   end
 end
 
 # DRIVER
-
+Controller.new
 

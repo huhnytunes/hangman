@@ -1,18 +1,23 @@
 require_relative 'hangman_view', 'hangman_model'
 
 class Controller
+  attr_accessor :word
   def initialize
     @viewer = Viewer.new
     @model = WordBank.new
-    @word = Word.new
-    @viewer.home
+    @word = ''
+    @word_filled = ''
+    @right_guesses
+    @status = @word.length
+    @wrong_guesses
+    choose_game_type
   end
 
-  def
+  def choose_game_type
     input = @viewer.home
     case input
     when '1'
-      @model.random_word
+      game_with_random_word
     when '2'
       game_with_word_length
     when '3'
@@ -20,37 +25,80 @@ class Controller
     end
   end
 
-  def game_with_word
-    word.downcase = @viewer.choose_word
-    @model.store_word(word)
+  def get_random_word
+    @word = @model.random_word
+    get_word_length(@word)
   end
 
-  def game_with_word_length
+  def get_word_with_length
     length = @viewer.choose_length
-    @model.get_word(length)
+    @word = @model.get_word(length)
+    set_blank_word_with_spaces(length)
   end
 
-  def get_guess
-    guess = @viewer.guess
-    check_guess(guess)
+  def get_word_from_user
+    @word = @viewer.choose_word
+    get_word_length(@word)
   end
 
-  def check_guess(guess)
-    @model.check_guess
+  def get_word_length(word)
+    length = word.length
+    set_blank_word_with_spaces(length)
   end
 
-  def fill_word
+  def set_blank_word_with_spaces(length)
+    @word_filled = (' |')*length
   end
 
-  def fill_guess_bank
+  def get_status
+    @status = @word.length - @word_filled.length
   end
 
-  def show_man # new / current ??
-    @viewer.show_man
-  end
+# @viewer.print_board(status = 6, word_with_spaces)
+  # def game_with_word
+  #   @word = @viewer.choose_word # downcase?
+  #   @viewer.print_board
+  # end
+
+  # def game_with_word_length
+  #   length = @viewer.choose_length
+  #   @model.get_word(length)
+  #   @viewer.print_board(status, word_with_spaces, used_letters, wrong_letters)
+  # end
 
 
-end
+#   def print_board
+#     return false if dead?
+#     return true if @status
+#     guess = @viewer.print_game(@status, @word_filled, )
+#     check_guess(guess)
+#     print_board
+#   end
+
+
+
+
+#   def get_guess
+#     guess = @viewer.guess
+#     check_guess(guess)
+#   end
+
+#   def check_guess(guess)
+#     @model.check_guess
+#   end
+
+#   def fill_word
+#   end
+
+#   def fill_guess_bank
+#   end
+
+#   def show_man # new / current ??
+#     @viewer.show_man
+#   end
+
+
+# end
 
 # DRIVER
 

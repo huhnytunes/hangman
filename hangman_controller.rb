@@ -3,8 +3,39 @@ require_relative 'hangman_view', 'hangman_model'
 class Controller
   def initialize
     @viewer = Viewer.new
-    @model = Words.new
+    @model = WordBank.new
+    @word = Word.new
+    run
   end
+
+  def run
+    input = @viewer.start_screen
+    case input
+    when '1'
+      game_with_word
+    when '2'
+      game_with_word_length
+    end
+  end
+
+  def game_with_word
+    word = @viewer.choose_word
+    @model.store_word(word)
+  end
+
+  def game_with_word_length
+    length = @viewer.choose_length
+    @model.get_word(length)
+  end
+
+  def get_guess
+    guess = @viewer.guess
+
+  end
+
+end
+
+
   # letter is in the word( true/false)
   # new_game
   # grab_word
@@ -14,8 +45,7 @@ class Controller
   # check_letter
   # => if right, fill_word
   # => if wrong, add to array of wrong letters
-  #
-end
+
 ##Controller(only returns word as string)
 # new_game(word_lenght)[not return]
 # current_word()[return current word with spaces as hidden letters]

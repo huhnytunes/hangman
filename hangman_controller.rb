@@ -6,10 +6,10 @@ class Controller
     @viewer = Viewer.new
     @model = WordBank.new
     @word = ''
-    @word_filled = ''
-    @right_guesses
+    # @word_filled = '_'
+    @right_guesses = []
+    @wrong_guesses = []
     @status = @word.length
-    @wrong_guesses
     choose_game_type
   end
 
@@ -47,12 +47,50 @@ class Controller
   end
 
   def set_blank_word_with_spaces(length)
-    @word_filled = (' |')*length
+    @word_filled = @word_filled*length
   end
 
   def get_status
-    @status = @word.length - @word_filled.length
+    @status = 6
+    if print_board
+      @viewer.won
+    else
+      @viewer.dead
+    end
   end
+
+  def print_board(word_filled)
+    return false if dead?
+    return true if won?(word_filled)
+    guess = @viewer.print_game(status, word_filled.join, @right_guesses, @wrong_guesses)
+    guess = guess.upcase
+    word_filled = @model.check_word(guess)
+    if @midel.is_right(guess)
+      @right_guesses << guess
+    else
+      @wrong_guesses << guess
+      @status -= 1
+    end
+    print_board(word_filled)
+  end
+
+  # def fill_word(letter_indexes)
+  #   if letter_indexes.length > 0
+  #     @word_filled.each_with_index do |i, e|
+  #       @word_filled[letter_indexes]
+
+  def dead?
+    true if @status = 0
+  end
+
+  def won?(word_filled)
+    true if word_filled.join.upcase == @model.word.upcase
+  end
+end
+
+# DRIVER
+
+
 
 # @viewer.print_board(status = 6, word_with_spaces)
   # def game_with_word
@@ -67,13 +105,7 @@ class Controller
   # end
 
 
-#   def print_board
-#     return false if dead?
-#     return true if @status
-#     guess = @viewer.print_game(@status, @word_filled, )
-#     check_guess(guess)
-#     print_board
-#   end
+
 
 
 
@@ -102,7 +134,7 @@ class Controller
 
 # DRIVER
 
-controller = Controller.new
+# controller = Controller.new
 
 
 

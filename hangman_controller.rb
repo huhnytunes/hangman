@@ -5,16 +5,18 @@ class Controller
     @viewer = Viewer.new
     @model = WordBank.new
     @word = Word.new
-    run
+    start_game
   end
 
-  def run
+  def start_game
     input = @viewer.start_screen
     case input
     when '1'
-      game_with_word
-    when '2'
       game_with_word_length
+    when '2'
+
+    when '3'
+      game_with_word
     end
   end
 
@@ -30,8 +32,23 @@ class Controller
 
   def get_guess
     guess = @viewer.guess
-
+    check_guess(guess)
   end
+
+  def check_guess(guess)
+    @model.check_guess
+  end
+
+  def fill_word
+  end
+
+  def fill_guess_bank
+  end
+
+  def show_man # new / current ??
+    @viewer.show_man
+  end
+
 
 end
 

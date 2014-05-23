@@ -5,23 +5,23 @@ class Controller
     @viewer = Viewer.new
     @model = WordBank.new
     @word = Word.new
-    start_game
+    @viewer.home
   end
 
-  def start_game
-    input = @viewer.start_screen
+  def
+    input = @viewer.home
     case input
     when '1'
-      game_with_word_length
+      @model.random_word
     when '2'
-
+      game_with_word_length
     when '3'
       game_with_word
     end
   end
 
   def game_with_word
-    word = @viewer.choose_word
+    word.downcase = @viewer.choose_word
     @model.store_word(word)
   end
 
@@ -51,6 +51,11 @@ class Controller
 
 
 end
+
+# DRIVER
+
+controller = Controller.new
+
 
 
   # letter is in the word( true/false)

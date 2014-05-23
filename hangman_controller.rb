@@ -5,11 +5,7 @@ class Controller
   def initialize
     @viewer = Viewer.new
     @model = WordBank.new
-    @word = ''
-    @word_filled = ''
-    @right_guesses
-    @status = @word.length
-    @wrong_guesses
+    @letter_bank = LetterBank.new
     choose_game_type
   end
 
@@ -17,117 +13,64 @@ class Controller
     input = @viewer.home
     case input
     when '1'
-      game_with_random_word
+      get_random_word
     when '2'
-      game_with_word_length
+      get_word_with_length
     when '3'
-      game_with_word
+      get_word_from_user
     end
   end
 
   def get_random_word
-    @word = @model.random_word
-    get_word_length(@word)
+    Word.new(@model.random_word)
+    print_board
   end
 
   def get_word_with_length
     length = @viewer.choose_length
-    @word = @model.get_word(length)
-    set_blank_word_with_spaces(length)
+    Word.new(@model.get_word(length))
+    print_board
   end
 
   def get_word_from_user
-    @word = @viewer.choose_word
-    get_word_length(@word)
+    Word.new(@viewer.choose_word)
+    print_board
   end
 
-  def get_word_length(word)
-    length = word.length
-    set_blank_word_with_spaces(length)
-  end
-
-  def set_blank_word_with_spaces(length)
-    @word_filled = (' |')*length
-  end
 
   def get_status
-    @status = @word.length - @word_filled.length
+    @status = 6
+    if print_board
+      @viewer.won(@word)
+    else
+      @viewer.dead(@word)
+    end
   end
 
-# @viewer.print_board(status = 6, word_with_spaces)
-  # def game_with_word
-  #   @word = @viewer.choose_word # downcase?
-  #   @viewer.print_board
-  # end
+  def print_board(word_filled)
+    return false if dead?
+    return true if won?(word_filled)
+    guess = @viewer.print_game(@status, word_filled.join, @letter_bank.correct, @letter_bank.incorrect)
+    guess = guess.upcase
+    word_filled = @model.check_word(guess)
+    if @model.is_correct?(guess)
+      @letter_bank.add_correct(guess)
+    else
+      @letter_bank.add_incorrect(guess)
+      @status -= 1
+    end
+    print_board(word_filled)
+  end
 
-  # def game_with_word_length
-  #   length = @viewer.choose_length
-  #   @model.get_word(length)
-  #   @viewer.print_board(status, word_with_spaces, used_letters, wrong_letters)
-  # end
+  def dead?
+    true if @status = 0
+  end
 
-
-#   def print_board
-#     return false if dead?
-#     return true if @status
-#     guess = @viewer.print_game(@status, @word_filled, )
-#     check_guess(guess)
-#     print_board
-#   end
-
-
-
-
-#   def get_guess
-#     guess = @viewer.guess
-#     check_guess(guess)
-#   end
-
-#   def check_guess(guess)
-#     @model.check_guess
-#   end
-
-#   def fill_word
-#   end
-
-#   def fill_guess_bank
-#   end
-
-#   def show_man # new / current ??
-#     @viewer.show_man
-#   end
-
-
-# end
+  def won?(word_filled)
+    true if word_filled.join.upcase == @model.word.upcase
+  end
+end
 
 # DRIVER
 
-controller = Controller.new
 
-
-
-  # letter is in the word( true/false)
-  # new_game
-  # grab_word
-  # show_man
-  # show_empty_word
-  # grab_letter
-  # check_letter
-  # => if right, fill_word
-  # => if wrong, add to array of wrong letters
-
-##Controller(only returns word as string)
-# new_game(word_lenght)[not return]
-# current_word()[return current word with spaces as hidden letters]
-# check_guess?(letter)[true/false]
-# is_finished? [true/false]
-
-#make a new model that gives a random word
-
-##viewer
-#start page(with new random game/ new game with own word/ new game with own length)
-# recursive loop with the guess bank / current man / current word
-#
-##model
-#read the words form the file
-#

@@ -6,34 +6,37 @@ class WordBank
   end
 
   def load_words
-    @words = File.open('dictionary.txt')
+    @words = File.open('word_bank.csv')
     @words.each_line do |word|
       @word_array << word.chomp
     end
     @words.close
-    write_words
+    csv_to_hash
   end
 
-  def write_words
-    @word_array = @word_array.sort_by {|word| word.length}
-    @new_list = File.open('word_bank.csv', 'w')
+  def csv_to_hash
+    @word_hash = {}
     @word_array.each do |word|
-      @new_list.write("#{word}\n")
+      word_length = word.size              # "gyne" => word
+      if @word_hash[word_length].is_a?(Array)
+        @word_hash[word_length] << word
+      else
+        @word_hash[word_length] = [word]
+      end
     end
-    @new_list.close
+  end
+
+  def get_word(size)
+    @word_hash[size].sample
+  end
+
+  def random_word
+    get_word(rand(4..24))
   end
 end
-#   def random_word(size = 2)
-#     word = ""
-#     until word.length >= size
-#       word << @word_array.sample
-#     end
-#     word
-#   end
-# end
 
 words = WordBank.new
-
+p words.random_word
 # words.load_words
 # p words.word_array
-# p words.random_word
+#p words.random_word

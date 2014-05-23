@@ -5,16 +5,10 @@ class WordBank
 
   def load_words
     @word_hash = {}
-    @words = File.open('word_bank.csv')
-    @words.each_line do |word|
+    File.read('word_bank.csv').each_line do |word|
       word_length = word.chomp.size
-      if @word_hash[word_length].is_a?(Array)
-        @word_hash[word_length] << word.chomp
-      else
-        @word_hash[word_length] = [word.chomp]
-      end
+      @word_hash[word_length].is_a?(Array) ? @word_hash[word_length] << word.chomp : @word_hash[word_length] = [word.chomp]
     end
-    @words.close
   end
 
   def get_word(size)

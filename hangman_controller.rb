@@ -5,8 +5,11 @@ class Controller
   def initialize
     @viewer = Viewer.new
     @model = WordBank.new
-    @letter_bank = LetterBank.new
+    continue_game
+  end
+  def continue_game
     choose_game_type
+    continue_game
   end
 
   def choose_game_type
@@ -23,17 +26,20 @@ class Controller
 
   def get_random_word
     @word = Word.new(@model.random_word)
+    @letter_bank = LetterBank.new
     get_status
   end
 
   def get_word_with_length
     length = @viewer.choose_length
     @word = Word.new(@model.get_word(length))
+    @letter_bank = LetterBank.new
     get_status
   end
 
   def get_word_from_user
     @word = Word.new(@viewer.choose_word)
+    @letter_bank = LetterBank.new
     get_status
   end
 
@@ -45,7 +51,6 @@ class Controller
     else
       @viewer.finish!(31, @word.target_word)
     end
-    @viewer.home
   end
 
   def print_board(word_filled)

@@ -1,3 +1,4 @@
+require 'colored'
 $o = ["         xxxxxxxxxx         ","      xxxxx      xxxxx      ","   xxxxx            xxxxx   ","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
 $u = ["xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
 $y = ["xxxxxx                xxxxxx","  xxxxxx            xxxxxx  ","    xxxxxx        xxxxxx    ","      xxxxxx    xxxxxx      ","        xxxxxxxxxxxx        ","          xxxxxxxx          ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           "]
@@ -6,12 +7,6 @@ $s = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","x
 $e = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
 $w = ["xxxxxxx            xxxxxxxxx            xxxxxxx","xxxxxxx            xxxxxxxxx            xxxxxxx"," xxxxxxx          xxxxxxxxxxx          xxxxxxx "," xxxxxxx          xxxxxxxxxxx          xxxxxxx ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","     xxxxxxx  xxxxxxx     xxxxxxx  xxxxxxx     ","      xxxxxxxxxxxxxx       xxxxxxxxxxxxxx      ","       xxxxxxxxxxxx         xxxxxxxxxxxx       "]
 $n = ["xxxxxxx          xxxx","xxxxxxxx         xxxx","xxxxxxxxx        xxxx","xxxx xxxxx       xxxx","xxxx  xxxxx      xxxx","xxxx   xxxxx     xxxx","xxxx    xxxxx    xxxx","xxxx     xxxxx   xxxx","xxxx      xxxxx  xxxx","xxxx       xxxxx xxxx","xxxx        xxxxxxxxx","xxxx         xxxxxxxx","xxxx          xxxxxxx"]
-$head = 'O'
-$left_arm = '_|'
-$right_arm = '|_'
-$left_leg = '|'
-$right_leg = '|'
-$body = '|'
-$hangman = ["      xxxxxxxxxxx  ","      x         |  ","      x         |  ","               x         #{$head}  ","                        x       #{$left_arm} #{$right_arm}","               x         #{$body}  ","                        x        #{$left_leg} #{$right_leg} ","      x            ","      x            ","xxxxxxxxxxxxxx     ","x            x     ","x            x     "]
 $bigger_terminal = "Make your terminal bigger!"
 $home_text = ["Welcome to hangman!!","What type if hangman do you wnat to play?","1. Play against the computer","2. You play against the computer, but can choose the length of the word","3. You choose the word"]
+$what_length = "What length do you want your word to be?"

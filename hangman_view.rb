@@ -1,47 +1,36 @@
+require_relative 'display_text'
 require 'colored'
 require 'terminfo'
-require 'highline/import'
 
 class Viewer
   def initialize
-    if TermInfo.screen_size[1].to_i < 110 ||TermInfo.screen_size[0].to_i < 36
-      puts "MAKE YOUR TERMINAL BIGGER!!!".red
-      sleep(10)
-      exit
-    end
+    test_term_size
     @lines = 0
-    @o = ["         xxxxxxxxxx         ","      xxxxx      xxxxx      ","   xxxxx            xxxxx   ","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
-    @u = ["xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","xxxxx                  xxxxx","   xxxxx            xxxxx   ","      xxxxx      xxxxx      ","         xxxxxxxxxx         "]
-    @y = ["xxxxxx                xxxxxx","  xxxxxx            xxxxxx  ","    xxxxxx        xxxxxx    ","      xxxxxx    xxxxxx      ","        xxxxxxxxxxxx        ","          xxxxxxxx          ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           ","           xxxxxx           "]
-    @l = ["xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    @s = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","              xxxxxxx","              xxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    @e = ["xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxx              ","xxxxxxx              ","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx","xxxxxxxxxxxxxxxxxxxxx"]
-    @w = ["xxxxxxx            xxxxxxxxx            xxxxxxx","xxxxxxx            xxxxxxxxx            xxxxxxx"," xxxxxxx          xxxxxxxxxxx          xxxxxxx "," xxxxxxx          xxxxxxxxxxx          xxxxxxx ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","  xxxxxxx        xxxxxxxxxxxxx        xxxxxxx  ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","   xxxxxxx      xxxxxxx xxxxxxx      xxxxxxx   ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","    xxxxxxx    xxxxxxx   xxxxxxx    xxxxxxx    ","     xxxxxxx  xxxxxxx     xxxxxxx  xxxxxxx     ","      xxxxxxxxxxxxxx       xxxxxxxxxxxxxx      ","       xxxxxxxxxxxx         xxxxxxxxxxxx       "]
-    @n = ["xxxxxxx          xxxx","xxxxxxxx         xxxx","xxxxxxxxx        xxxx","xxxx xxxxx       xxxx","xxxx  xxxxx      xxxx","xxxx   xxxxx     xxxx","xxxx    xxxxx    xxxx","xxxx     xxxxx   xxxx","xxxx      xxxxx  xxxx","xxxx       xxxxx xxxx","xxxx        xxxxxxxxx","xxxx         xxxxxxxx","xxxx          xxxxxxx"]
+  end
+  def test_term_size
+    @heigth, @with = TermInfo.screen_size
+    if @with.to_i < 110 || @heigth.to_i < 36
+      puts $bigger_terminal.red
+      sleep(0.4)
+      test_term_size
+    end
+    return true
   end
   def clear
     print "\e[2J"
     print "\e[H"
     @lines = 0
   end
-  def fill(times, lineup_space= '')
-    times.times do
-      print ' '
+  def write_line(text,color)
+    lineup_space = '         ' if color
+    unless @lines >= @heigth.to_i
+      puts "#{print text.center(@with.to_i,' ')}#{lineup_space}"
     end
-    print lineup_space
-    ""
   end
-
-  def print_line(text, color = true, lines = 1, set_space = 6)
-    mid = TermInfo.screen_size[1].to_i
-    half_set = mid.to_i/set_space
-    mid_rest = TermInfo.screen_size[1].to_i - half_set*2
+  def print_line(text, lines = 1, color = true)
     lines.times do
       @lines += 1
-      lineup_space =  '         ' if color
-      unless @lines >= TermInfo.screen_size[0].to_i
-        puts "#{fill(half_set)}#{print text.center(mid_rest,' ')}#{fill((half_set),lineup_space)}"
-      end
+      write_line(text,color)
     end
   end
   def find_term_size(size = 2)
@@ -50,14 +39,11 @@ class Viewer
   end
   def home
     clear
-    print_line(' ',false,7)
-    print_line("Welcome to hangman!!".red,)
-    print_line("What type if hangman do you wnat to play?".red)
-    print_line("1. Play against the computer".green)
-    print_line("2. You play against the computer, but can choose the length of the word".green)
-    print_line("3. You choose the word".green)
-    print_line("".green)
-    print_line(' ',false,99)
+    print_line(' ',7,false)
+    $home_text.each do |text|
+      print_line(text.red)
+    end
+    print_line(' ',99,false)
     awnser = gets.chomp
     return awnser
   end
@@ -74,9 +60,9 @@ class Viewer
   end
   def print_game(status, word, right_letters, wrong_letters)
     clear
-    head,left_arm,right_arm,body,left_leg,right_leg = set_person(status)
+    set_person(status)
     unless status == 0
-      print_board(head,left_arm,right_arm,body,left_leg,right_leg)
+      print_board
       guessed_letters(right_letters,wrong_letters)
     end
     print_line(word)
@@ -95,64 +81,43 @@ class Viewer
         new_letters << letter.white
       end
     end
-    print_line(new_letters.join)
+    print_line(new_letters.join(" "))
   end
-  def dead(word)
+  def finish!(result, word)
     clear
-    print_line(' ',false,3)
-    @o.length.times do |num|
-      print_line("#{@y[num]}     #{@o[num]}     #{@u[num]}".red)
+    print_line(' ',3,false)
+    13.times do |num|
+      print_line("#{$y[num]}     #{$o[num]}     #{$u[num]}".blue)
     end
-    print_line(' ',false,3)
-    @o.length.times do |num|
-      print_line("#{@l[num]}     #{@o[num]}     #{@s[num]}     #{@e[num]}".red)
+    print_line(' ',3,false)
+    13.times do |num|
+      print_line("#{$w[num]}     #{$o[num]}     #{$n[num]}".green) if result == 32
+      print_line("#{$l[num]}     #{$o[num]}     #{$s[num]}     #{$e[num]}".red) if result == 31
     end
-    print_line(' ',false,3)
+    print_line(' ',3,false)
     print_line("The word was #{word.join.blue}".green)
     sleep(5)
   end
-  def won!(word)
-    clear
-    print_line(' ',false,3)
-    @o.length.times do |num|
-      print_line("#{@y[num]}     #{@o[num]}     #{@u[num]}".green)
-    end
-    print_line(' ',false,3)
-    @o.length.times do |num|
-      print_line("#{@w[num]}     #{@o[num]}     #{@n[num]}".green)
-    end
-    print_line(' ',false,3)
-    print_line("The word was #{word.join.blue}".green)
-    sleep(5)
-  end
+
   def set_person(status)
-    head = 'O'.red
-    left_arm = '_|'.green
-    right_arm = '|_'.green
-    left_leg = '|'.green
-    right_leg = '|'.green
-    body = '|'.green
-    left_arm = '  '.red if status <= 1
-    right_arm = '  '.red if status <= 2
-    body = ' '.red if status <= 3
-    left_leg = ' '.red if status <= 4
-    right_leg = ' '.red if status <= 5
-    return head,left_arm,right_arm,body,left_leg,right_leg
+    $head = 'O'.red
+    $left_arm = '_|'.green
+    $right_arm = '|_'.green
+    $left_leg = '|'.green
+    $right_leg = '|'.green
+    $body = '|'.green
+    $head = 'O'.red if status <= 0
+    $left_arm = '  '.red if status <= 1
+    $right_arm = '  '.red if status <= 2
+    $body = ' '.red if status <= 3
+    $left_leg = ' '.red if status <= 4
+    $right_leg = ' '.red if status <= 5
   end
-  def print_board(head,left_arm,right_arm,body,left_leg,right_leg)
-    print_line(' ',false,3)
-    print_line("      xxxxxxxxxxx  ".yellow,true)
-    print_line("      x         |  ".yellow,true)
-    print_line("      x         |  ".yellow,true)
-    print_line("               x         #{head}  ".yellow,true)
-    print_line("                        x       #{left_arm} #{right_arm}".yellow,true)
-    print_line("               x         #{body}  ".yellow,true)
-    print_line("                        x        #{left_leg} #{right_leg} ".yellow,true)
-    print_line("      x            ".yellow,true)
-    print_line("      x            ".yellow,true)
-    print_line("xxxxxxxxxxxxxx     ".yellow,true)
-    print_line("x            x     ".yellow,true)
-    print_line("x            x     ".yellow,true)
-    print_line(' ',false,3)
+  def print_board
+    print_line(' ',3,false)
+    $hangman.each do |line_in_hangman|
+      print_line(line_in_hangman.green)
+    end
+    print_line(' ',3,false)
   end
 end

@@ -1,5 +1,6 @@
 require_relative 'hangman_view'
 require_relative 'hangman_model'
+require_relative 'online_model'
 class Controller
   attr_accessor :word
   def initialize
@@ -21,9 +22,29 @@ class Controller
       get_word_with_length
     when '3'
       get_word_from_user
+    when '4'
+      online_mode
     end
   end
-
+  def online_mode
+    @chat = Chat.new('chat.freenode.net', 6667)
+    @chat.login
+    users_online = @chat.list_all_users
+    input = @viewer.online_mode(users_online)
+    case input
+    when '1'
+      join_chat
+    when '2'
+      #go to online mode game
+    end
+  end
+  def join_chat
+    @chat.chat
+  end
+  def join_online_game
+    @chat = Chat.new('chat.freenode.net', 6667)
+    @chat.login
+  end
   def get_random_word
     @word = Word.new(@model.random_word)
     @letter_bank = LetterBank.new

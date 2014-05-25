@@ -42,6 +42,26 @@ class Viewer
     clear
     print_line(' ',7)
     $home_text.each do |text|
+      print_line(text)
+    end
+    print_line(' ',99)
+    awnser = $stdin.gets.chomp
+    return awnser
+  end
+  def online_mode(users_online)
+    clear
+    print_line(' ',2)
+    if users_online.length != 0
+    print_line("This is the users online:".green)
+      users_online.each do |user|
+        print_line("#{user[0]}  status:  #{user[1]}".yellow)
+      end
+    else
+      print_line("There is no users online".yellow)
+      print_line(' ',2)
+    end
+    print_line(' ',2)
+    $online_mode_text.each do |text|
       print_line(text.red)
     end
     print_line(' ',99)
@@ -82,17 +102,14 @@ class Viewer
       end
     end
     print "\n"
-
   end
   def finish!(result, word)
-
     100.times do |times_num|
       clear
       print_line(' ',3)
       13.times do |num|
         print_line("#{$y[num]}     #{$o[num]}     #{$u[num]}")
       end
-
       print_line(' ',3)
       13.times do |num|
         print_line("#{$w[num]}     #{$o[num]}     #{$n[num]}") if result == 32

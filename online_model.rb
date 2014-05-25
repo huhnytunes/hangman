@@ -8,16 +8,16 @@ class IRC
     printf "\033[0m"
   end
   def clear
-    print "\e[2J"
-    print "\e[H"
+    #print "\e[2J"
+    #print "\e[H"
   end
-	def initialize(server, port, nick, channel)
+	def initialize(server, port, channel, nick='not_set')
 		@server = server
 		@port = port
 		@nick = nick
 		@right_nick = false
 		@channel = channel
-		connect
+		login
 	end
 	def say(s)
 		#puts "--> #{s}"
@@ -27,14 +27,28 @@ class IRC
     say "PRIVMSG ##{@channel} :#{msg}"
   end
   def send(msg)
-		if msg == LIST
+		if msg == 'LIST'
+      puts 'yes'
       list_users
      else
      	say_c(msg)
      end
 
   end
+  def get_new_nick(new_nick=false)
+    clear
+    if new_nick
+      color{puts "You can not use that nickname, it is probably someone else that is using it right now...."}
+      color{puts "Choose a new nick name"}
+    else
+      color{puts "What nick do you want?"}
+    end
+    @nick = gets.chomp
+    @right_nick = false
+    change_nick
+  end
   def change_nick
+    color{puts "Verifying nickname"}
 		say("WHO #{@nick}")
 		lines = []
 		until @right_nick
@@ -42,34 +56,45 @@ class IRC
 			lines << ret.split(" ")[1]
 			if ret.match(" :End of /WHO list.")
 				if lines.include?("352")
-					clear
-					color{puts "You can not use that nickname, it is probably someone else that is using it right now...."}
-					color{puts "Choose a new nick name"}
-					@nick = gets.chomp
-					change_nick
+          get_new_nick(true)
 				else
 					say("NICK #{@nick}")
+          clear
+          color{puts "Nick verifyed"}
 					@right_nick = true
 				end
 			end
 		end
   end
 	def connect
+    color{puts "Connecting to server..."}
 		@irc = TCPSocket.open(@server, @port)
-		nick = "Bot#{rand(100_000_000_000).to_s}"
-		say "USER #{nick} 0 * #{nick}"
-		say "NICK #{nick}"
+		@user = "Bot#{rand(100_000_000_000).to_s}"
+		say "USER #{@user} 0 * #{@user}"
+		say "NICK #{@user}"
 		@eof = @irc.eof
 	end
+  def connect_check
+    connected = false
+    until connected
+      ret = @irc.gets
+      if ret.match(" :End of /MOTD command.")
+        color{puts "You are now connected to the server :)"}
+        connected = true
+      end
+    end
+  end
 	def join
 		say "JOIN ##{@channel}"
-		say_c "Logged in"
+		say_c "I have logged in with the username #{@user} and the nick #{@nick}"
+    clear
+    color{puts "you can start your message with LIST to see who else is in the chat."}
 	end
 	def list_users
+    color{puts "starting"}
 		say("WHO ##{@channel}")
 		lines = []
 	 	stop = false
-	 	pust "starting"
 		until stop
 			ret = @irc.gets
 			puts ret
@@ -88,7 +113,7 @@ class IRC
 			#end
 		end
 	end
-	def run
+	def get
 		until @irc.eof do
 			full_msg = @irc.gets
 			if full_msg.match(/^PING :(.*)$/)
@@ -106,24 +131,22 @@ class IRC
     say "PART ##{@channel} Leaving..."
     say 'QUIT'
   end
+  def login
+    connect
+    connect_check
+    get_new_nick
+    join
+    chat
+  end
+  def chat
+    recive_irc = Thread.new {get}
+    send_irc = Thread.new do
+      until @eof do
+        send(gets.chomp)
+      end
+    end
+    recive_irc.join
+    send_irc.join
+  end
 end
-print "\e[2J"
-print "\e[H"
-ip = 'chat.freenode.net'
-port = 6667
-puts "What nickname do you want to use?"
-nick = gets.chomp
-channel = 'dbc'
-irc = IRC.new(ip, port, nick, channel)
-irc.change_nick
-irc.join
-recive_irc = Thread.new {irc.run}
-send_irc = Thread.new do
-	until irc.eof { irc.send(gets.chomp) }
-end
-print "\e[2J"
-print "\e[H"
-puts "You have logged in succsessfully :D"
-puts "you can start your message with LIST to see who else is in the chat."
-recive_irc.join
-send_irc.join
+IRC.new('chat.freenode.net', 6667, 'dbc')

@@ -85,14 +85,14 @@ class Viewer
 
   end
   def finish!(result, word)
-    
+
     100.times do |times_num|
       clear
       print_line(' ',3)
       13.times do |num|
         print_line("#{$y[num]}     #{$o[num]}     #{$u[num]}")
       end
-      
+
       print_line(' ',3)
       13.times do |num|
         print_line("#{$w[num]}     #{$o[num]}     #{$n[num]}") if result == 32
